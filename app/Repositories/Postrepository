@@ -1,0 +1,63 @@
+<?php
+namespace App\Repositories;
+use Illuminate\Support\Facades\Auth; 
+use App\Models\Producto;
+use App;
+use DB;
+
+class Postrepository{
+    public function listar()
+    {
+        $productos = Producto::where('estado', 1)->paginate(5);
+    }
+
+    public function searchById(string $id)
+    {
+      
+        $producto = Producto::findOrFail($id);
+
+        return response()->json(
+            [
+                "producto" => $producto,
+            ], 200
+        );
+        
+    }
+
+    public function create(Request $request)
+    {
+     
+            $producto = new Producto([
+                "nombre"=> $request->nombre,
+                "descripcion"=> $request->descripcion,
+                "cantidad"=> $request->cantidad,
+                "estado"=> 0,
+            ]);
+
+            return response()->json(
+                [
+                    "producto" => $producto,
+                    "msg" => "Producto creado!!",
+                ], 200
+            );
+    }
+
+    public function update(string $id, Request $request)
+    {
+            $producto = Producto::findOrFail($id);
+            $producto->nombre = $request->nombre;
+            $producto->descripcion = $request->descripcion;
+            $producto->cantidad = $request->cantidad;
+            $producto->update();
+    }
+
+
+    public function delete(string $id)
+    {
+            $producto = Producto::findOrFail($id);
+            $producto->delete();
+    }
+
+}
+
+?>

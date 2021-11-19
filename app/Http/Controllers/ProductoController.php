@@ -7,22 +7,29 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use App\Repositories\Postrepository;
 use App\Models\Producto;
-
+ 
 class ProductoController extends Controller
 {
+
+    private $productoRepository;
+
+    public function __construct(Postrepository $repository){
+        $this->productoRepository = $repository;
+    }
 
     public function listar()
     {
         try {
-            $productos = Producto::where('estado', 1)->paginate(5);
+            $productos = $this->productoRepository->listar();
 
             return response()->json(
                 [
                     "productos" => $productos,
                 ], 200
             );
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json($th->getMessage());
         }
     }
@@ -30,14 +37,14 @@ class ProductoController extends Controller
     public function searchById(string $id)
     {
         try {
-            $producto = Producto::findOrFail($id);
+            $producto = $this->productoRepository->searchById($id);
 
             return response()->json(
                 [
                     "producto" => $producto,
                 ], 200
             );
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json($th->getMessage());
         }
     }
@@ -45,12 +52,8 @@ class ProductoController extends Controller
     public function create(Request $request)
     {
         try {
-            $producto = new Producto([
-                "nombre": $request->nombre,
-                "descripcion": $request->descripcion,
-                "cantidad": $request->cantidad,
-                "estado": 0,
-            ]);
+
+            $producto = $this->productoRepository->create($request);
 
             return response()->json(
                 [
@@ -59,7 +62,7 @@ class ProductoController extends Controller
                 ], 200
             );
 
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json($th->getMessage());
         }
     }
@@ -80,7 +83,7 @@ class ProductoController extends Controller
                 ], 200
             );
 
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json($th->getMessage());
         }
     }
@@ -97,7 +100,7 @@ class ProductoController extends Controller
                     "msg" => "Producto Eliminado!!",
                 ], 200
             );
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json($th->getMessage());
         }
     }

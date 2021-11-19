@@ -7,18 +7,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use App\Repositories\Authrepository;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    private $authRepository;
+
+
+    public function __construct(Authrepository $repository)
     {
         $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->authRepository = $repository;
     }
    /**
      * Register a new user.
@@ -38,11 +38,7 @@ class AuthController extends Controller
             return response()->json(['error' => $validator->messages()],422);
         }
 
-        $user=User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = $this->authRepository->create($data);
 
         return $user->exists 
                     ?   response()->json(['message' => 'El usuario '.$user->email.' se creó.'],201)
