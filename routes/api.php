@@ -28,3 +28,10 @@ Route::group([
     Route::post('register',[AuthController::class,'register'])->name('auth.register');
 
 });
+
+
+Route::get('productos', [ProductoController::class, 'listar']);
+Route::get('producto/{id}', [ProductoController::class, 'searchById']);
+Route::post('producto', [ProductoController::class, 'create']);
+Route::patch('producto/{id}', [ProductoController::class, 'update']);
+Route::patch('delete/{id}', [ProductoController::class, 'delete']);
